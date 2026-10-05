@@ -191,10 +191,12 @@ const params = new URLSearchParams(location.search);
 const pedido = {
   id: params.get('pid') || '',
   nombre: params.get('nombre') || 'cliente',
+  telefono: params.get('telefono') || '',
   kilos: Number(params.get('kilos') || 0),
   precioKg: Number(params.get('precio') || 0),
   direccion: params.get('direccion') || '',
-  comuna: params.get('comuna') || ''
+  comuna: params.get('comuna') || '',
+  fechaEntrega: params.get('entrega') || ''
 };
 const hayPedido = pedido.id && pedido.kilos > 0;
 const total = pedido.kilos * pedido.precioKg;
@@ -248,16 +250,25 @@ function horarioTexto(){
 
 function mensajeConfirmacion(metodo){
   const h = horarioTexto();
-  let base = `Hola! Soy ${pedido.nombre}. Confirmo mi pedido de ${pedido.kilos} kg (${fmtCLP(total)}) en ${pedido.direccion}${pedido.comuna ? ', '+pedido.comuna : ''}.`;
-  if (h) base += ` Me acomoda recibirlo ${h}.`;
-  if (metodo === 'entrega') return base + '\n\nPagaré en efectivo/débito cuando reciba el pedido. 💵' + (refCorta ? `\n\nRef: ${refCorta}` : '');
-  return base + '\n\nYa hice la transferencia y les voy a adjuntar mi comprobante en este chat. 🏦📎' + (refCorta ? `\n\nRef: ${refCorta}` : '');
+  const lineas = ['🌱 CONFIRMACIÓN DE PEDIDO', ''];
+  lineas.push(`Nombre: ${pedido.nombre}`);
+  if (pedido.telefono) lineas.push(`Teléfono: ${pedido.telefono}`);
+  lineas.push(`Dirección: ${pedido.direccion}${pedido.comuna ? ', '+pedido.comuna : ''}`);
+  lineas.push(`Kilos: ${pedido.kilos} kg`);
+  lineas.push(`Precio por kilo: ${fmtCLP(pedido.precioKg)}`);
+  lineas.push(`Total: ${fmtCLP(total)}`);
+  if (pedido.fechaEntrega) lineas.push(`Entrega: ${fmtFechaLarga(pedido.fechaEntrega)}${h ? ' — '+h : ''}`);
+  else if (h) lineas.push(`Horario preferido: ${h}`);
+  lineas.push(`Pago: ${metodo === 'entrega' ? 'Pago a la entrega (efectivo/débito)' : 'Transferencia — comprobante adjunto en este chat 📎'}`);
+  if (refCorta) lineas.push(`Ref: ${refCorta}`);
+  return lineas.join('\n');
 }
 
 function chipRow(){
+  const fecha = pedido.fechaEntrega ? fmtFechaLarga(pedido.fechaEntrega) : null;
   return `
-    <p style="font-weight:800; margin:18px 0 4px;">📅 ¿Qué horario te acomoda más?</p>
-    <p class="muted" style="margin-bottom:6px;">Así te avisamos por WhatsApp justo antes de llegar — opcional, pero ayuda mucho.</p>
+    <p style="font-weight:800; margin:18px 0 4px;">📅 ${fecha ? `Te entregamos el <span style="color:var(--green-dark)">${fecha}</span>` : 'Tu fecha de entrega la confirma la empresa'}</p>
+    <p class="muted" style="margin-bottom:6px;">¿Qué horario te acomoda más ese día? Así te avisamos por WhatsApp justo antes de llegar — opcional, pero ayuda mucho.</p>
     <div class="chip-row">
       <div class="chip ${horario==='manana'?'sel':''}" data-horario="manana"><span class="ic">🌅</span>Mañana</div>
       <div class="chip ${horario==='tarde'?'sel':''}" data-horario="tarde"><span class="ic">🌇</span>Tarde</div>
@@ -289,9 +300,9 @@ function render(){
           <div class="amount">${fmtCLP(total)}</div>
           <div class="kg">${pedido.kilos} kg · ${fmtCLP(pedido.precioKg)} por kilo</div>
         </div>
-        ${pedido.direccion ? `
-        <div class="ticket-sep"></div>
-        <div class="summary-row"><span class="ic">📍</span><span class="lbl">Entrega en</span><span class="val">${pedido.direccion}${pedido.comuna ? ', '+pedido.comuna : ''}</span></div>` : ''}
+        ${(pedido.direccion || pedido.fechaEntrega) ? `<div class="ticket-sep"></div>` : ''}
+        ${pedido.fechaEntrega ? `<div class="summary-row"><span class="ic">📅</span><span class="lbl">Te lo entregamos</span><span class="val">${fmtFechaLarga(pedido.fechaEntrega)}</span></div>` : ''}
+        ${pedido.direccion ? `<div class="summary-row"><span class="ic">📍</span><span class="lbl">Entrega en</span><span class="val">${pedido.direccion}${pedido.comuna ? ', '+pedido.comuna : ''}</span></div>` : ''}
       </div>
 
       <div class="testimonial">

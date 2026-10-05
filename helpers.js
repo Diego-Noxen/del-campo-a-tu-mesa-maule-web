@@ -17,6 +17,18 @@ function fmtFecha(iso) {
   return d.toLocaleDateString('es-CL', { day: '2-digit', month: 'short', year: 'numeric' });
 }
 
+function fmtFechaLarga(iso) {
+  if (!iso) return '-';
+  const d = new Date(iso + 'T00:00:00');
+  return d.toLocaleDateString('es-CL', { weekday: 'long', day: 'numeric', month: 'long' });
+}
+
+function addDias(iso, n) {
+  const d = new Date(iso + 'T00:00:00');
+  d.setDate(d.getDate() + n);
+  return d.toISOString().slice(0, 10);
+}
+
 function diasDesde(iso) {
   if (!iso) return 0;
   const d1 = new Date(iso + 'T00:00:00');
