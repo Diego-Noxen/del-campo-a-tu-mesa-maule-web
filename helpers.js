@@ -56,3 +56,25 @@ function waLink(telefono, texto) {
   const num = (telefono || '').replace(/[^\d]/g, '');
   return `https://wa.me/${num}?text=${encodeURIComponent(texto)}`;
 }
+
+function escapeHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+// Parsea un .txt exportado de WhatsApp ("Exportar chat" > "sin multimedia").
+// Soporta el formato iOS "[d/m/aa, h:mm:ss a. m.] Nombre: texto" y el de
+// Android "d/m/aaaa, h:mm - Nombre: texto". Líneas sin marca de tiempo se
+// consideran continuación del mensaje anterior (saltos de línea dentro de un mensaje).
+function parseWhatsappExport(text) {
+  const lineRe = /^\[?(\d{1,2}\/\d{1,2}\/\d{2,4}),?\s+([\d:]{3,8}(?:\s?[ap]\.?\s?m\.?)?)\]?\s*[-–]?\s*([^:]{1,60}):\s?(.*)$/i;
+  const out = [];
+  text.split(/\r?\n/).forEach(line => {
+    const m = line.match(lineRe);
+    if (m) {
+      out.push({ fecha: m[1], hora: m[2].trim(), remitente: m[3].trim(), texto: m[4] });
+    } else if (out.length && line.trim()) {
+      out[out.length - 1].texto += '\n' + line;
+    }
+  });
+  return out;
+}

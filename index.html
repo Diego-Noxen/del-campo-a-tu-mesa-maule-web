@@ -6,25 +6,58 @@
 <title>Del Campo a tu Mesa Maule</title>
 <link rel="stylesheet" href="style.css">
 <style>
+  :root{
+    --page-bg-top: var(--cream-dark);
+    --page-bg-bottom: var(--cream);
+    --card-bg: var(--white);
+    --ink2: var(--ink);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --cream: #1E2420;
+      --cream-dark: #262D27;
+      --white: #2A322C;
+      --ink: #EDE9DA;
+      --green-dark: #9CCB9F;
+      --green: #7FBE86;
+      --brown: #D7A872;
+      --page-bg-top: #171C19;
+      --page-bg-bottom: #1E2420;
+      --card-bg: #262D27;
+    }
+    .big-total .kg, .muted{ color:#A9B3A6; }
+    .bank-row{ border-bottom-color:#3A423B; }
+    .choice-btn{ border-color:#3A423B; }
+    .upload-zone{ background:#232A24; border-color:var(--green); }
+    .note-box{ background:#332B18; color:#F0D597; }
+  }
   body{
     min-height:100vh;
     display:flex; align-items:flex-start; justify-content:center;
-    background:linear-gradient(180deg, var(--cream-dark) 0%, var(--cream) 220px);
+    background:linear-gradient(180deg, var(--page-bg-top) 0%, var(--page-bg-bottom) 260px);
     font-size:18px;
   }
-  .wrap{width:100%; max-width:480px; padding:18px; padding-bottom:110px;}
+  .wrap{width:100%; max-width:480px; padding:18px; padding-bottom:120px;}
   .header{text-align:center; padding:18px 0 8px;}
-  .header img{width:108px; height:108px; margin:0 auto 10px; border:3px solid var(--gold); box-shadow:var(--shadow);}
+  .header img{width:108px; height:108px; margin:0 auto 10px; border:3px solid var(--gold); box-shadow:var(--shadow); border-radius:50%;}
   .header h1{font-size:20px; margin:0;}
+  .header .tag{font-size:12px; color:#8a9a8b; font-weight:800; letter-spacing:.04em; text-transform:uppercase; margin-top:2px;}
   .progress{display:flex; justify-content:center; gap:6px; margin:14px 0 20px;}
   .dot{width:10px;height:10px;border-radius:50%;background:#DCD3AD;}
   .dot.active{background:var(--green);}
+
+  .card{background:var(--card-bg);}
 
   .screen{display:none;}
   .screen.active{display:block; animation:fadein .25s ease;}
   @keyframes fadein{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
 
-  .big-total{text-align:center; padding:22px; margin:16px 0;}
+  .ref-tag{font-size:11px; font-weight:800; color:#8a9a8b; text-align:center; margin-bottom:6px;}
+  .summary-row{display:flex; align-items:center; gap:10px; padding:8px 0;}
+  .summary-row .ic{font-size:20px; width:28px; text-align:center;}
+  .summary-row .lbl{flex:1; color:#8a9a8b; font-size:14px; font-weight:700;}
+  .summary-row .val{font-weight:900; color:var(--green-dark);}
+  .big-total{text-align:center; padding:18px 0 8px;}
   .big-total .amount{font-size:42px; font-weight:900; color:var(--green-dark); line-height:1;}
   .big-total .kg{font-size:16px; color:#7a8a7c; font-weight:800; margin-top:6px;}
 
@@ -32,13 +65,23 @@
     width:100%; text-align:left;
     display:flex; align-items:center; gap:16px;
     padding:20px; margin-bottom:14px;
-    border-radius:18px; border:2px solid #E3DDC4; background:var(--white);
+    border-radius:18px; border:2px solid #E3DDC4; background:var(--card-bg);
     box-shadow:var(--shadow);
     font-weight:800; font-size:18px; color:var(--green-dark);
   }
   .choice-btn .ic{font-size:32px;}
   .choice-btn:active{transform:scale(.98);}
   .choice-btn small{display:block; font-weight:600; font-size:13px; color:#7a8a7c; margin-top:2px;}
+
+  .chip-row{display:flex; gap:10px; margin:14px 0; flex-wrap:wrap;}
+  .chip{
+    flex:1; min-width:100px; text-align:center;
+    padding:16px 10px; border-radius:14px; border:2px solid #E3DDC4; background:var(--card-bg);
+    font-weight:800; font-size:14px; color:var(--green-dark); cursor:pointer;
+  }
+  .chip .ic{display:block; font-size:24px; margin-bottom:4px;}
+  .chip.sel{border-color:var(--green); background:#E3EEDF;}
+  @media (prefers-color-scheme: dark){ .chip.sel{ background:#2E3B2F; } }
 
   .bank-row{display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px dashed #E3DDC4;}
   .bank-row:last-child{border-bottom:none;}
@@ -60,18 +103,26 @@
   }
   @keyframes pop{0%{transform:scale(0);} 70%{transform:scale(1.15);} 100%{transform:scale(1);}}
 
+  .next-steps{background:var(--cream-dark); border-radius:14px; padding:16px; text-align:left; margin-top:16px;}
+  .next-steps .step{display:flex; gap:10px; align-items:flex-start; margin-bottom:10px; font-size:14px;}
+  .next-steps .step:last-child{margin-bottom:0;}
+  .next-steps .num{background:var(--green); color:#fff; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:900; flex-shrink:0;}
+
   .floating-help{
     position:fixed; bottom:0; left:0; right:0;
-    display:flex; justify-content:center; padding:14px; background:linear-gradient(0deg, var(--cream) 60%, transparent);
+    display:flex; justify-content:center; gap:10px; padding:14px; background:linear-gradient(0deg, var(--page-bg-bottom) 60%, transparent);
   }
   .floating-help a{
     display:flex; align-items:center; gap:8px;
-    background:var(--whatsapp); color:white; font-weight:800;
-    padding:14px 22px; border-radius:999px; box-shadow:0 6px 20px rgba(37,211,102,.4);
-    text-decoration:none; font-size:15px;
+    font-weight:800;
+    padding:14px 20px; border-radius:999px; box-shadow:0 6px 20px rgba(0,0,0,.15);
+    text-decoration:none; font-size:14px;
   }
+  .floating-help .fh-wa{background:var(--whatsapp); color:white;}
+  .floating-help .fh-call{background:var(--card-bg); color:var(--green-dark); border:2px solid var(--green);}
 
   .copy-chip{font-size:13px; font-weight:800; color:var(--green); background:#E3EEDF; padding:4px 10px; border-radius:999px; border:none;}
+  @media (prefers-color-scheme: dark){ .copy-chip{ background:#2E3B2F; } }
   .not-found{text-align:center; padding:60px 20px;}
   .note-box{background:#FBEDD2; border-radius:14px; padding:14px; font-size:14px; margin-top:14px; color:#6b4f14;}
 </style>
@@ -81,6 +132,7 @@
   <div class="header">
     <img class="badge-logo" src="assets/logo-badge.jpg" alt="Del Campo a tu Mesa Maule">
     <h1>Del Campo a tu Mesa Maule</h1>
+    <div class="tag">Directo del campo a tu puerta</div>
   </div>
   <div class="progress" id="progressDots">
     <div class="dot active"></div><div class="dot"></div>
@@ -89,7 +141,8 @@
 </div>
 
 <div class="floating-help">
-  <a id="whatsappHelp" href="#" target="_blank">💬 ¿Tienes dudas? Escríbenos</a>
+  <a class="fh-wa" id="whatsappHelp" href="#" target="_blank">💬 Escríbenos</a>
+  <a class="fh-call" id="callHelp" href="#">📞 Llamar</a>
 </div>
 
 <script src="helpers.js"></script>
@@ -109,8 +162,10 @@ const pedido = {
 const hayPedido = pedido.id && pedido.kilos > 0;
 const total = pedido.kilos * pedido.precioKg;
 const primerNombre = pedido.nombre.split(' ')[0];
+const refCorta = pedido.id ? pedido.id.replace(/^ped_/, '').slice(-6).toUpperCase() : '';
 
-document.getElementById('whatsappHelp').href = waLink(WHATSAPP_NUMERO, 'Hola, tengo una duda con mi pedido 🙂');
+document.getElementById('whatsappHelp').href = waLink(WHATSAPP_NUMERO, 'Hola, tengo una duda con mi pedido 🙂' + (refCorta ? ' (ref. '+refCorta+')' : ''));
+document.getElementById('callHelp').href = 'tel:+' + WHATSAPP_NUMERO;
 
 const BANK_INFO = {
   banco: 'Banco Estado',
@@ -122,16 +177,44 @@ const BANK_INFO = {
 };
 
 let screen = 'inicio';
+let horario = null; // 'mañana' | 'tarde' | 'cualquiera'
+let metodoElegido = null;
 
 function setProgress(step){
   document.getElementById('progressDots').innerHTML =
     `<div class="dot ${step>=1?'active':''}"></div><div class="dot ${step>=2?'active':''}"></div>`;
 }
 
+function horarioTexto(){
+  if (horario === 'manana') return 'en la mañana';
+  if (horario === 'tarde') return 'en la tarde';
+  if (horario === 'cualquiera') return 'a cualquier hora';
+  return null;
+}
+
 function mensajeConfirmacion(metodo){
-  const base = `Hola! Soy ${pedido.nombre}. Confirmo mi pedido de ${pedido.kilos} kg (${fmtCLP(total)}) en ${pedido.direccion}${pedido.comuna ? ', '+pedido.comuna : ''}.`;
-  if (metodo === 'entrega') return base + '\n\nPagaré en efectivo/débito cuando reciba el pedido. 💵';
-  return base + '\n\nYa hice la transferencia y les voy a adjuntar mi comprobante en este chat. 🏦📎';
+  const h = horarioTexto();
+  let base = `Hola! Soy ${pedido.nombre}. Confirmo mi pedido de ${pedido.kilos} kg (${fmtCLP(total)}) en ${pedido.direccion}${pedido.comuna ? ', '+pedido.comuna : ''}.`;
+  if (h) base += ` Me acomoda recibirlo ${h}.`;
+  if (metodo === 'entrega') return base + '\n\nPagaré en efectivo/débito cuando reciba el pedido. 💵' + (refCorta ? `\n\nRef: ${refCorta}` : '');
+  return base + '\n\nYa hice la transferencia y les voy a adjuntar mi comprobante en este chat. 🏦📎' + (refCorta ? `\n\nRef: ${refCorta}` : '');
+}
+
+function chipRow(){
+  return `
+    <p style="font-weight:800; margin:18px 0 4px;">📅 ¿Qué horario te acomoda más?</p>
+    <p class="muted" style="margin-bottom:6px;">Así te avisamos por WhatsApp justo antes de llegar — opcional, pero ayuda mucho.</p>
+    <div class="chip-row">
+      <div class="chip ${horario==='manana'?'sel':''}" data-horario="manana"><span class="ic">🌅</span>Mañana</div>
+      <div class="chip ${horario==='tarde'?'sel':''}" data-horario="tarde"><span class="ic">🌇</span>Tarde</div>
+      <div class="chip ${horario==='cualquiera'?'sel':''}" data-horario="cualquiera"><span class="ic">🤷</span>Cualquier hora</div>
+    </div>`;
+}
+
+function bindChips(){
+  document.querySelectorAll('[data-horario]').forEach(el => {
+    el.addEventListener('click', () => { horario = el.dataset.horario; render(); });
+  });
 }
 
 function render(){
@@ -144,6 +227,7 @@ function render(){
   if (screen === 'inicio'){
     setProgress(1);
     app.innerHTML = `
+      ${refCorta ? `<div class="ref-tag">Pedido #${refCorta}</div>` : ''}
       <div class="card">
         <h2>¡Hola, ${primerNombre}! 👋</h2>
         <p>Este es el resumen de tu pedido de espárragos frescos del Maule:</p>
@@ -151,7 +235,7 @@ function render(){
           <div class="amount">${fmtCLP(total)}</div>
           <div class="kg">${pedido.kilos} kg · ${fmtCLP(pedido.precioKg)} por kilo</div>
         </div>
-        ${pedido.direccion ? `<p class="muted">📍 Entrega en: ${pedido.direccion}${pedido.comuna ? ', '+pedido.comuna : ''}</p>` : ''}
+        ${pedido.direccion ? `<div class="summary-row"><span class="ic">📍</span><span class="lbl">Entrega en</span><span class="val">${pedido.direccion}${pedido.comuna ? ', '+pedido.comuna : ''}</span></div>` : ''}
       </div>
 
       <h3 style="margin:22px 0 12px;">¿Cómo quieres pagar?</h3>
@@ -164,8 +248,22 @@ function render(){
         <span>Transferencia bancaria<small>Te mostramos los datos y nos envías tu comprobante por WhatsApp</small></span>
       </button>
     `;
-    document.getElementById('btnEntrega').addEventListener('click', () => { screen='entrega'; render(); });
-    document.getElementById('btnTransferencia').addEventListener('click', () => { screen='transferencia'; render(); });
+    document.getElementById('btnEntrega').addEventListener('click', () => { metodoElegido='entrega'; screen='horario'; render(); });
+    document.getElementById('btnTransferencia').addEventListener('click', () => { metodoElegido='transferencia'; screen='horario'; render(); });
+  }
+
+  else if (screen === 'horario'){
+    setProgress(2);
+    app.innerHTML = `
+      <button class="back-link" id="btnBack">← Volver</button>
+      <div class="card">
+        <h2>Casi listo</h2>
+        ${chipRow()}
+        <button class="btn btn-block" id="btnSiguiente" style="margin-top:18px;">Continuar</button>
+      </div>`;
+    document.getElementById('btnBack').addEventListener('click', () => { screen='inicio'; render(); });
+    bindChips();
+    document.getElementById('btnSiguiente').addEventListener('click', () => { screen = metodoElegido; render(); });
   }
 
   else if (screen === 'entrega'){
@@ -182,7 +280,7 @@ function render(){
         <a class="btn btn-block" id="btnConfirmarEntrega" target="_blank" style="margin-top:10px; text-decoration:none;" href="${waLink(WHATSAPP_NUMERO, mensajeConfirmacion('entrega'))}">Confirmar por WhatsApp</a>
       </div>
     `;
-    document.getElementById('btnBack').addEventListener('click', () => { screen='inicio'; render(); });
+    document.getElementById('btnBack').addEventListener('click', () => { screen='horario'; render(); });
     document.getElementById('btnConfirmarEntrega').addEventListener('click', () => { screen='confirmado'; setTimeout(render, 400); });
   }
 
@@ -217,7 +315,7 @@ function render(){
 
       <a class="btn btn-block" id="btnEnviarComprobante" target="_blank" style="margin-top:16px; text-decoration:none;" href="${waLink(WHATSAPP_NUMERO, mensajeConfirmacion('transferencia'))}">Enviar por WhatsApp</a>
     `;
-    document.getElementById('btnBack').addEventListener('click', () => { screen='inicio'; render(); });
+    document.getElementById('btnBack').addEventListener('click', () => { screen='horario'; render(); });
     document.getElementById('btnCopiarDatos').addEventListener('click', () => {
       const txt = `Banco: ${BANK_INFO.banco}\nTipo de cuenta: ${BANK_INFO.tipo}\nTitular: ${BANK_INFO.titular}\nRUT: ${BANK_INFO.rut}\nN° cuenta: ${BANK_INFO.numero}\nEmail: ${BANK_INFO.email}`;
       navigator.clipboard.writeText(txt).then(()=>{
@@ -225,7 +323,6 @@ function render(){
         el.style.display='inline'; setTimeout(()=>el.style.display='none', 1500);
       });
     });
-
     const uploadZone = document.getElementById('uploadZone');
     const fileInput = document.getElementById('fileInput');
     uploadZone.addEventListener('click', () => fileInput.click());
@@ -233,9 +330,7 @@ function render(){
       const file = fileInput.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = (e) => {
-        document.getElementById('previewBox').innerHTML = `<img src="${e.target.result}" alt="Vista previa del comprobante">`;
-      };
+      reader.onload = (e) => { document.getElementById('previewBox').innerHTML = `<img src="${e.target.result}" alt="Vista previa del comprobante">`; };
       reader.readAsDataURL(file);
     });
     document.getElementById('btnEnviarComprobante').addEventListener('click', () => { screen='confirmado'; setTimeout(render, 400); });
@@ -247,7 +342,12 @@ function render(){
       <div class="card" style="text-align:center;">
         <div class="confirm-check">✓</div>
         <h2>¡Listo, gracias ${primerNombre}!</h2>
-        <p>Te escribimos apenas confirmemos tu pedido de ${pedido.kilos} kg de espárragos frescos del Maule.</p>
+        <p>Tu pedido de ${pedido.kilos} kg de espárragos frescos del Maule quedó registrado.</p>
+        <div class="next-steps">
+          <div class="step"><span class="num">1</span><span>Revisamos tu confirmación en WhatsApp.</span></div>
+          <div class="step"><span class="num">2</span><span>El día de tu entrega te escribimos avisando que vamos en camino — no tienes que estar pendiente antes.</span></div>
+          <div class="step"><span class="num">3</span><span>Al recibir tu pedido, te mandamos una encuestita cortita — nos ayuda mucho tu opinión 🙏</span></div>
+        </div>
         <a class="btn btn-whatsapp btn-block" style="margin-top:16px; text-decoration:none;" target="_blank" href="${waLink(WHATSAPP_NUMERO,'¡Hola de nuevo!')}">Volver a WhatsApp</a>
       </div>
     `;
